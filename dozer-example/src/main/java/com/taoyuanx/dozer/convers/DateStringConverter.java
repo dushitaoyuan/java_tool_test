@@ -1,4 +1,4 @@
-package com.taoyuanx.dto.dozer.convers;
+package com.taoyuanx.dozer.convers;
 
 import com.vip.vjtools.vjkit.time.DateFormatUtil;
 import org.dozer.DozerConverter;

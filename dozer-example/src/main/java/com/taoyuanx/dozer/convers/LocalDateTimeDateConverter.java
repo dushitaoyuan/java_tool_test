@@ -1,4 +1,4 @@
-package com.taoyuanx.dto.dozer.convers;
+package com.taoyuanx.dozer.convers;
 
 import org.dozer.DozerConverter;
 

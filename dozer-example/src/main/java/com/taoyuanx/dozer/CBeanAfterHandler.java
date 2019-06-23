@@ -1,4 +1,4 @@
-package com.taoyuanx.dto.dozer;
+package com.taoyuanx.dozer;
 
 /**
  * @author 桃源
