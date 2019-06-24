@@ -6,6 +6,7 @@ dozer bean工具例子及扩展
 ## 测试结果
 
 |lib|Benchmark avg score|
+|-|-|
 |dozer|11.706|
 |org.apache.commons.beanutils.BeanUtils|8.646|
 |org.apache.commons.beanutils.PropertyUtils|8.830|
