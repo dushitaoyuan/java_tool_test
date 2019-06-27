@@ -1,6 +1,6 @@
 package com.taoyuanx;
 
-import com.taoyuanx.beanmapper.CBeanMapper;
+import com.taoyuanx.dozer.CBeanMapper;
 import com.taoyuanx.dto.UserDTO;
 import com.taoyuanx.entity.UserDO;
 import org.apache.commons.beanutils.BeanUtils;
