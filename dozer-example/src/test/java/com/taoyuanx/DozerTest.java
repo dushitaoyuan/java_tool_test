@@ -7,11 +7,13 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -22,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
-@State(Scope.Thread) //Thread: 该状态为每个线程独享。
+@State(Scope.Benchmark)
 public class DozerTest {
 
     @Test
@@ -109,7 +111,7 @@ public class DozerTest {
                 .measurementBatchSize(100)
                 .warmupBatchSize(100)
                 .build();
-        new Runner(opt).run();
+        Collection<RunResult> run = new Runner(opt).run();
 
     }
 }
