@@ -4,7 +4,7 @@ disruptor 简单使用例子,参见com.taoyuanx.disruptor.example.LogEventMain
 
 
 
-##使用场景简介
+## 使用场景简介
 
 ## 消息发送
 场景描述:<br/>
