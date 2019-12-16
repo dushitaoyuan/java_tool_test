@@ -1,6 +1,6 @@
-## disruptor-example 简介
+## guice-example 简介
 
-disruptor 简单使用例子,参见com.taoyuanx.disruptor.example.LogEventMain
+guice 简单使用例子,参见com.taoyuanx.guice.example
 
 
 
@@ -11,15 +11,50 @@ disruptor 简单使用例子,参见com.taoyuanx.disruptor.example.LogEventMain
 有一耗时业务逻辑,处理完毕后,还需向多个第三方等推送通知,此场景可借助disruptor 事件机制
 
 
-###  业务日志存储
-场景描述:<br/>
-特点:业务简单,保存频繁,非核心业务逻辑
-可借助,disruptor 事件机制,批量转存
+### guice常用注解简介
+* @ImplementedBy
+```java
+# 注解在service上,指定service的实现
+例子:
+@ImplementedBy(TruckCarServiceImpl.class)
+public interface CarService {
+    void dirve();
+}
+```
+*  @Inject  @Named
+
+```java
+#Inject 注解在方法,构造方法,属性上 和@Autowired 用法类似
+#@Named 同  @Qualifier   
+#例子:
+    @Inject
+    @Named("bus")
+    CarService carService;
+```
+
+* @Singleton 
+声明作用域,参见:Scopes:SINGLETON|NO_SCOPE,也可以自定义
+
+*  @Provides 声明提供类
+```java
 
 
-###  登录计数,最后登录时间,ip等
+    @Provides
+    public CarService carService(@Named("truck") CarService truck, @Named("bus") CarService bus) {
+       if(  Math.random()>0.5){
+           return truck;
+       }
+       return  bus;
 
-登录事件触发登录处理,异步处理
+    }
+``` 
 
-### 邮件,短信,等耗时操作
-
+### 高级用法
+利用guice实现 类似spring的扫描,参见:com.taoyuanx.guice.example.test.module.BasePackageModule
+目前支持注解:Service,Component,Primary
+#### 核心逻辑
+* 包扫描
+* guice注入
+1. 有实现 注入所有实现
+2. 没有实现注入自身
+3. 为支持 @Name 类似@Qualifier ,需保证 直接 使用 @Inject 可以找到primary依赖,如无primary依赖,注入实现列表的第一个
