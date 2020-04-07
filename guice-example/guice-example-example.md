@@ -6,11 +6,6 @@ guice 简单使用例子,参见com.taoyuanx.guice.example
 
 ## 使用场景简介
 
-### 消息发送
-场景描述:<br/>
-有一耗时业务逻辑,处理完毕后,还需向多个第三方等推送通知,此场景可借助disruptor 事件机制
-
-
 ### guice常用注解简介
 * @ImplementedBy
 ```java
