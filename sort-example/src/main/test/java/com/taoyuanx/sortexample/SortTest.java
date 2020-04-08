@@ -23,6 +23,9 @@ public class SortTest {
     public void before() {
         array = new Integer[]{11, 6, 9, 6, 13, 7, 2, 11, 4, 17, 19, 17, 2, 6, 14};
         sorted = new Integer[]{19, 17, 17, 14, 13, 11, 11, 9, 7, 6, 6, 6, 4, 2, 2};
+
+        array = new Integer[]{1,2,3,4,5};
+        sorted = new Integer[]{5,4,3,2,1};
     }
 
     @Test
@@ -44,6 +47,30 @@ public class SortTest {
     public void insertSortTest() {
         Sort<Integer> integerSort = new InsertSort<>();
         Integer[] sort = integerSort.sort(array, descComparator);
+        System.out.println(Arrays.toString(sort));
+        System.out.println(Arrays.equals(sorted,sort));
+    }
+
+    @Test
+    public void shellSortTest() {
+        Sort<Integer> shellSort = new ShellSort<>();
+        Integer[] sort = shellSort.sort(array, descComparator);
+        System.out.println(Arrays.toString(sort));
+        System.out.println(Arrays.equals(sorted,sort));
+    }
+
+    @Test
+    public void mergeSortTest() {
+        Sort<Integer> mergeSort = new MergeSort<Integer>();
+        Integer[] sort = mergeSort.sort(array, descComparator);
+        System.out.println(Arrays.toString(sort));
+        System.out.println(Arrays.equals(sorted,sort));
+    }
+
+    @Test
+    public void quickSortTest() {
+        Sort<Integer> quickSortTest = new QuickSort<>();
+        Integer[] sort = quickSortTest.sort(array, descComparator);
         System.out.println(Arrays.toString(sort));
         System.out.println(Arrays.equals(sorted,sort));
     }
