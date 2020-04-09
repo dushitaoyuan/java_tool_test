@@ -24,7 +24,7 @@ public class SortTest {
     public void before() {
         array = new Integer[]{11, 6, 9, 6, 13, 7, 2, 11, 4, 17, 19, 17, 2, 6, 14};
         sorted = Arrays.copyOf(array, array.length);
-        Arrays.sort(sorted,descComparator);
+        Arrays.sort(sorted, descComparator);
     }
 
     @Test
@@ -76,13 +76,12 @@ public class SortTest {
     }
 
     @Test
-    public void heaportTest() {
+    public void heapSortTest() {
         Sort<Integer> heapSortTest = new HeapSort<>();
         Integer[] sort = heapSortTest.sort(array, descComparator);
         System.out.println(Arrays.toString(sort));
         System.out.println(Arrays.equals(sorted, sort));
         HeapSort<Integer> heapSortTest2 = new HeapSort<>();
         HeapSort.TreeNode<Integer> integerTreeNode = heapSortTest2.arrayToMaxHeap(sort, descComparator);
-        heapSortTest2.printNode(integerTreeNode);
     }
 }

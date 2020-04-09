@@ -2,9 +2,8 @@ package com.taoyuanx.sortexample;
 
 import com.taoyuanx.sortexample.sort.Sort;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author dushitaoyuan
@@ -106,26 +105,30 @@ public class HeapSort<T> implements Sort<T> {
     public TreeNode<T> arrayToMaxHeap(T[] array, Comparator comparator) {
         T[] maxHeapArray = sort(array, comparator);
         TreeNode<T> treeNode = new TreeNode<>(maxHeapArray[0], 0);
-        setLeftAndRight(maxHeapArray, treeNode, 0, 1);
+        LevelMap<T> levelMap = new LevelMap<>();
+        setLeftAndRight(maxHeapArray, treeNode, 0, levelMap);
+        printNode(levelMap);
         return treeNode;
     }
 
-    private void setLeftAndRight(T[] array, TreeNode<T> node, int nodeIndex, int deep) {
+    private void setLeftAndRight(T[] array, TreeNode<T> node, int nodeIndex, LevelMap<T> levelMap) {
         /**
          * 左右节点index
          */
+        levelMap.put(node.getDeep(), node);
         int leftNodeIndex = 2 * nodeIndex + 1;
         int rightNodeIndex = 2 * nodeIndex + 2;
         TreeNode<T> leftNode = null, rightNode = null;
+        int nextDeep = node.getDeep() + 1;
         if (leftNodeIndex < array.length) {
-            leftNode = new TreeNode<>(array[leftNodeIndex], deep);
+            leftNode = new TreeNode<>(array[leftNodeIndex], nextDeep);
             node.setLeftNode(leftNode);
-            setLeftAndRight(array, leftNode, leftNodeIndex, deep+1);
+            setLeftAndRight(array, leftNode, leftNodeIndex, levelMap);
         }
         if (rightNodeIndex < array.length) {
-            rightNode = new TreeNode<>(array[leftNodeIndex], deep);
+            rightNode = new TreeNode<>(array[rightNodeIndex], nextDeep);
             node.setRightNode(rightNode);
-            setLeftAndRight(array, rightNode, rightNodeIndex, deep+1);
+            setLeftAndRight(array, rightNode, rightNodeIndex, levelMap);
         }
     }
 
@@ -161,19 +164,35 @@ public class HeapSort<T> implements Sort<T> {
 
     }
 
-    public <T> void printNode(TreeNode<T> node) {
-        if (Objects.isNull(node)) {
-            return;
-        }
-        System.out.println("deep:" + node.getDeep() + "\t" + node.getRootNode());
-        if (Objects.nonNull(node.getLeftNode())) {
-            printNode(node.getLeftNode());
-        }
-        if (Objects.nonNull(node.getRightNode())) {
-            printNode(node.getLeftNode());
+    public void printNode(LevelMap<T> levelMap) {
+        int maxLevel = levelMap.getMap().size() - 1;
 
+    }
+
+    private String repeat(String str, Integer repeatNum) {
+        if (repeatNum == 0) {
+            return "";
+        }
+        StringBuilder buf = new StringBuilder(str);
+        for (int i = 0; i < repeatNum; i++) {
+            buf.append(str);
+        }
+        return buf.toString();
+    }
+
+    static class LevelMap<T> {
+        private Map<Integer, List<TreeNode<T>>> map = new HashMap<>();
+
+        public Map<Integer, List<TreeNode<T>>> getMap() {
+            return map;
         }
 
+        public void put(int level, TreeNode<T> node) {
+            if (!map.containsKey(level)) {
+                map.put(level, new ArrayList<>());
+            }
+            map.get(level).add(node);
+        }
 
     }
 
