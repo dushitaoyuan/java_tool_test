@@ -34,17 +34,20 @@ public class QuickSort<T> implements Sort<T> {
         T pivot = array[low];
         while (low < high) {
             //找高部分比基准数大的下标
-            while (low < high && comparator.compare(array[high], pivot) >=0) {
+            while (low < high && comparator.compare(array[high], pivot) >= 0) {
                 high--;
             }
+            //将大于基准的数移到基准左边
             array[low] = array[high];
             //找低部分比基准数小的下标
             while (low < high && comparator.compare(pivot, array[low]) >= 0) {
                 low++;
             }
+            //将小于基准的数移到基准右边
             array[high] = array[low];
 
         }
+        //low==high 基准归位()
         array[low] = pivot;
         return low;
     }

@@ -23,7 +23,7 @@ public class MergeSort<T> implements Sort<T> {
         if (array.length < 2) {
             return array;
         }
-        int mid = array.length / 2;
+        int mid = array.length >>> 1;
         T[] leftArray = sort(Arrays.copyOfRange(array, 0, mid), comparator);
         T[] rightArray = sort(Arrays.copyOfRange(array, mid, array.length), comparator);
         return merge(leftArray, rightArray, comparator);
