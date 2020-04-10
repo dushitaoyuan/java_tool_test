@@ -14,7 +14,8 @@ import java.util.Comparator;
  */
 public class SortTest {
     private Integer[] array;
-    private Integer[] sorted;
+    private Integer[] descSorted;
+    private Integer[] ascSorted;
     private Comparator<Integer> ascComparator = (x, y) -> {
         return x - y;
     };
@@ -23,8 +24,10 @@ public class SortTest {
     @Before
     public void before() {
         array = new Integer[]{11, 6, 9, 6, 13, 7, 2, 11, 4, 17, 19, 17, 2, 6, 14};
-        sorted = Arrays.copyOf(array, array.length);
-        Arrays.sort(sorted, descComparator);
+        descSorted = Arrays.copyOf(array, array.length);
+        Arrays.sort(descSorted, descComparator);
+        ascSorted = Arrays.copyOf(array, array.length);
+        Arrays.sort(ascSorted, ascComparator);
     }
 
     @Test
@@ -32,7 +35,7 @@ public class SortTest {
         Sort<Integer> bubbleSort = new BubbleSort<Integer>();
         Integer[] sort = bubbleSort.sort(array, descComparator);
         System.out.println(Arrays.toString(sort));
-        System.out.println(Arrays.equals(sorted, sort));
+        System.out.println(Arrays.equals(descSorted, sort));
     }
 
     @Test
@@ -40,7 +43,7 @@ public class SortTest {
         Sort<Integer> selectSort = new SelectSort<>();
         Integer[] sort = selectSort.sort(array, descComparator);
         System.out.println(Arrays.toString(sort));
-        System.out.println(Arrays.equals(sorted, sort));
+        System.out.println(Arrays.equals(descSorted, sort));
     }
 
     @Test
@@ -48,7 +51,7 @@ public class SortTest {
         Sort<Integer> integerSort = new InsertSort<>();
         Integer[] sort = integerSort.sort(array, descComparator);
         System.out.println(Arrays.toString(sort));
-        System.out.println(Arrays.equals(sorted, sort));
+        System.out.println(Arrays.equals(descSorted, sort));
     }
 
     @Test
@@ -56,7 +59,7 @@ public class SortTest {
         Sort<Integer> shellSort = new ShellSort<>();
         Integer[] sort = shellSort.sort(array, descComparator);
         System.out.println(Arrays.toString(sort));
-        System.out.println(Arrays.equals(sorted, sort));
+        System.out.println(Arrays.equals(descSorted, sort));
     }
 
     @Test
@@ -64,15 +67,15 @@ public class SortTest {
         Sort<Integer> mergeSort = new MergeSort<Integer>();
         Integer[] sort = mergeSort.sort(array, descComparator);
         System.out.println(Arrays.toString(sort));
-        System.out.println(Arrays.equals(sorted, sort));
+        System.out.println(Arrays.equals(descSorted, sort));
     }
 
     @Test
     public void quickSortTest() {
         Sort<Integer> quickSortTest = new QuickSort<>();
-        Integer[] sort = quickSortTest.sort(array, descComparator);
+        Integer[] sort = quickSortTest.sort(array, ascComparator);
         System.out.println(Arrays.toString(sort));
-        System.out.println(Arrays.equals(sorted, sort));
+        System.out.println(Arrays.equals(descSorted, sort));
     }
 
     @Test
@@ -80,8 +83,24 @@ public class SortTest {
         Sort<Integer> heapSortTest = new HeapSort<>();
         Integer[] sort = heapSortTest.sort(array, descComparator);
         System.out.println(Arrays.toString(sort));
-        System.out.println(Arrays.equals(sorted, sort));
+        System.out.println(Arrays.equals(descSorted, sort));
         HeapSort<Integer> heapSortTest2 = new HeapSort<>();
         HeapSort.TreeNode<Integer> integerTreeNode = heapSortTest2.arrayToMaxHeap(sort, descComparator);
+    }
+
+    @Test
+    public void countSortTest() {
+        Sort<Integer> countSortTest = new CountSort();
+        Integer[] sort = countSortTest.sort(array, descComparator);
+        System.out.println(Arrays.toString(sort));
+        System.out.println(Arrays.equals(descSorted, sort));
+    }
+
+    @Test
+    public void bucketSortTest() {
+        Sort<Integer> bucketSortTest = new BucketSort(5);
+        Integer[] sort = bucketSortTest.sort(array, ascComparator);
+        System.out.println(Arrays.toString(sort));
+        System.out.println(Arrays.equals(descSorted, sort));
     }
 }

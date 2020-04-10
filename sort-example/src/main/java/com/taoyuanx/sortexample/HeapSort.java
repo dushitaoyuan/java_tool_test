@@ -2,6 +2,7 @@ package com.taoyuanx.sortexample;
 
 import com.taoyuanx.sortexample.sort.Sort;
 
+import javax.swing.tree.TreeNode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,85 +54,6 @@ public class HeapSort<T> implements Sort<T> {
     }
 
 
-    public static class TreeNode<T> {
-        private T rootNode;
-        private TreeNode<T> leftNode;
-        private TreeNode<T> rightNode;
-        private int deep;
-
-        public TreeNode(T rootNode, int deep) {
-            this.rootNode = rootNode;
-            this.deep = deep;
-        }
-
-        public T getRootNode() {
-            return rootNode;
-        }
-
-        public void setRootNode(T rootNode) {
-            this.rootNode = rootNode;
-        }
-
-        public TreeNode<T> getLeftNode() {
-            return leftNode;
-        }
-
-        public void setLeftNode(TreeNode<T> leftNode) {
-            this.leftNode = leftNode;
-        }
-
-        public TreeNode<T> getRightNode() {
-            return rightNode;
-        }
-
-        public void setRightNode(TreeNode<T> rightNode) {
-            this.rightNode = rightNode;
-        }
-
-        public int getDeep() {
-            return deep;
-        }
-
-        public void setDeep(int deep) {
-            this.deep = deep;
-        }
-
-
-    }
-
-    /**
-     * 数组转 堆
-     */
-    public TreeNode<T> arrayToMaxHeap(T[] array, Comparator comparator) {
-        T[] maxHeapArray = sort(array, comparator);
-        TreeNode<T> treeNode = new TreeNode<>(maxHeapArray[0], 0);
-        LevelMap<T> levelMap = new LevelMap<>();
-        setLeftAndRight(maxHeapArray, treeNode, 0, levelMap);
-        printNode(levelMap);
-        return treeNode;
-    }
-
-    private void setLeftAndRight(T[] array, TreeNode<T> node, int nodeIndex, LevelMap<T> levelMap) {
-        /**
-         * 左右节点index
-         */
-        levelMap.put(node.getDeep(), node);
-        int leftNodeIndex = 2 * nodeIndex + 1;
-        int rightNodeIndex = 2 * nodeIndex + 2;
-        TreeNode<T> leftNode = null, rightNode = null;
-        int nextDeep = node.getDeep() + 1;
-        if (leftNodeIndex < array.length) {
-            leftNode = new TreeNode<>(array[leftNodeIndex], nextDeep);
-            node.setLeftNode(leftNode);
-            setLeftAndRight(array, leftNode, leftNodeIndex, levelMap);
-        }
-        if (rightNodeIndex < array.length) {
-            rightNode = new TreeNode<>(array[rightNodeIndex], nextDeep);
-            node.setRightNode(rightNode);
-            setLeftAndRight(array, rightNode, rightNodeIndex, levelMap);
-        }
-    }
-
     /**
      * 堆调整
      */
@@ -164,36 +86,195 @@ public class HeapSort<T> implements Sort<T> {
 
     }
 
-    public void printNode(LevelMap<T> levelMap) {
-        int maxLevel = levelMap.getMap().size() - 1;
+
+    private <T> void writeArray(TreeNode<T> currNode, int rowIndex, int columnIndex, String[][] res, int treeDepth) {
+        if (currNode == null) {
+            return;
+        }
+        // 先将当前节点保存到二维数组中
+        res[rowIndex][columnIndex] = String.valueOf(currNode.rootNode);
+
+        int nodeDepth = currNode.getDepth();
+
+        if (nodeDepth == treeDepth) {
+            return;
+        }
+        /**
+         * 每行的元素间隔
+         */
+        int gap = treeDepth - nodeDepth - 1;
+
+        /**
+         * 填充左右子节点及其连接符
+         */
+        if (Objects.nonNull(currNode.leftNode)) {
+            res[rowIndex + 1][columnIndex - gap] = "/";
+            writeArray(currNode.leftNode, rowIndex + 2, columnIndex - gap * 2, res, treeDepth);
+        }
+
+        if (Objects.nonNull(currNode.rightNode)) {
+            res[rowIndex + 1][columnIndex + gap] = "\\";
+            writeArray(currNode.rightNode, rowIndex + 2, columnIndex + gap * 2, res, treeDepth);
+        }
+    }
+
+
+    public <T> void show(TreeNode<T> root) {
+        if (root == null) {
+            return;
+        }
+        // 得到树的深度
+        int treeDepth = getTreeDepth(root);
+
+        /**
+         * 二维数组存储整棵二叉树(包含连接符和空格)
+         * hight(数组高度)=2*treeDepth  - 1
+         * width(数组宽度)=2^(treeDepth-1)*3+1
+         */
+        int hight = 2 * treeDepth - 1;
+        int width = Double.valueOf(Math.pow(2, treeDepth - 1)).intValue() * 3 + 1;
+        String[][] res = new String[hight][width];
+        System.out.println("树高:" + treeDepth);
+        for (int i = 0; i < hight; i++) {
+            for (int j = 0; j < width; j++) {
+                res[i][j] = " ";
+
+            }
+        }
+        /**
+         * 根在数组中的坐标(0,width/2)
+         */
+        writeArray(root, 0, width / 2, res, treeDepth);
+        /**
+         * 按行 打印数组
+         */
+        Arrays.stream(res).forEach(row -> {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < row.length; i++) {
+                sb.append(row[i]);
+                if (row[i].length() > 1 && i <= row.length - 1) {
+                    i += row[i].length() > 4 ? 2 : row[i].length() - 1;
+                }
+            }
+            System.out.println(sb.toString());
+        });
 
     }
 
-    private String repeat(String str, Integer repeatNum) {
-        if (repeatNum == 0) {
+    public static class TreeNode<T> {
+        private T rootNode;
+        private TreeNode<T> leftNode;
+        private TreeNode<T> rightNode;
+        private int depth;
+
+        public TreeNode(T rootNode, int depth) {
+            this.rootNode = rootNode;
+            this.depth = depth;
+        }
+
+        public T getRootNode() {
+            return rootNode;
+        }
+
+        public void setRootNode(T rootNode) {
+            this.rootNode = rootNode;
+        }
+
+        public TreeNode<T> getLeftNode() {
+            return leftNode;
+        }
+
+        public void setLeftNode(TreeNode<T> leftNode) {
+            this.leftNode = leftNode;
+        }
+
+        public TreeNode<T> getRightNode() {
+            return rightNode;
+        }
+
+        public void setRightNode(TreeNode<T> rightNode) {
+            this.rightNode = rightNode;
+        }
+
+        public int getDepth() {
+            return depth;
+        }
+
+        public void setDepth(int depth) {
+            this.depth = depth;
+        }
+    }
+
+    /**
+     * 数组转 堆
+     */
+    public TreeNode<T> arrayToMaxHeap(T[] array, Comparator comparator) {
+        T[] maxHeapArray = sort(array, comparator);
+        TreeNode<T> treeNode = new TreeNode<>(maxHeapArray[0], 0);
+        setLeftAndRight(maxHeapArray, treeNode, 0);
+        show(treeNode);
+        return treeNode;
+    }
+
+    private void setLeftAndRight(T[] array, TreeNode<T> node, int nodeIndex) {
+        /**
+         * 左右节点index
+         */
+
+        int leftNodeIndex = 2 * nodeIndex + 1;
+        int rightNodeIndex = 2 * nodeIndex + 2;
+        TreeNode<T> leftNode = null, rightNode = null;
+        int nextDepth = node.getDepth() + 1;
+        if (leftNodeIndex < array.length) {
+            leftNode = new TreeNode<>(array[leftNodeIndex], nextDepth);
+            node.setLeftNode(leftNode);
+            setLeftAndRight(array, leftNode, leftNodeIndex);
+        }
+        if (rightNodeIndex < array.length) {
+            rightNode = new TreeNode<>(array[rightNodeIndex], nextDepth);
+            node.setRightNode(rightNode);
+            setLeftAndRight(array, rightNode, rightNodeIndex);
+        }
+    }
+
+    private int getTreeDepth(TreeNode root) {
+        return root == null ? 0 : (1 + Math.max(getTreeDepth(root.leftNode), getTreeDepth(root.rightNode)));
+    }
+
+    private int getMaxNodeLength(TreeNode root) {
+        if (Objects.isNull(root)) {
+            return 0;
+        }
+        int nodeLen = root == null ? 1 : String.valueOf(root.rootNode).length();
+        int leftNodeLen = getMaxNodeLength(root.leftNode);
+        int rightNodeLen = getMaxNodeLength(root.rightNode);
+        return Math.max(Math.max(nodeLen, leftNodeLen), rightNodeLen);
+    }
+
+    private String repeat(String str, int num) {
+        if (num == 0) {
             return "";
         }
-        StringBuilder buf = new StringBuilder(str);
-        for (int i = 0; i < repeatNum; i++) {
+        StringBuilder buf = new StringBuilder();
+        for (int i = 0; i < num; i++) {
             buf.append(str);
         }
         return buf.toString();
     }
 
-    static class LevelMap<T> {
-        private Map<Integer, List<TreeNode<T>>> map = new HashMap<>();
-
-        public Map<Integer, List<TreeNode<T>>> getMap() {
-            return map;
+    private String padding(String str, int strLen, String paddingStr) {
+        StringBuilder buf = new StringBuilder();
+        int midPaddingLen = (strLen - str.length()) / 2;
+        for (int i = 0; i < midPaddingLen; i++) {
+            buf.append(paddingStr);
         }
-
-        public void put(int level, TreeNode<T> node) {
-            if (!map.containsKey(level)) {
-                map.put(level, new ArrayList<>());
-            }
-            map.get(level).add(node);
+        buf.append(str);
+        for (int i = 0; i < midPaddingLen; i++) {
+            buf.append(paddingStr);
         }
-
+        if (buf.length() != strLen) {
+            buf.append(paddingStr);
+        }
+        return buf.toString();
     }
-
 }
