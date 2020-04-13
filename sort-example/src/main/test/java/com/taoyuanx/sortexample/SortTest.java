@@ -4,13 +4,13 @@ import com.taoyuanx.sortexample.sort.Sort;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
 /**
  * @author dushitaoyuan
  * @desc 排序测试
  * @date 2020/4/7
+ *
  */
 public class SortTest {
     private Integer[] array;
@@ -99,8 +99,27 @@ public class SortTest {
     @Test
     public void bucketSortTest() {
         Sort<Integer> bucketSortTest = new BucketSort(5);
-        Integer[] sort = bucketSortTest.sort(array, ascComparator);
+        Integer[] sort = bucketSortTest.sort(array, descComparator);
         System.out.println(Arrays.toString(sort));
         System.out.println(Arrays.equals(descSorted, sort));
+    }
+    @Test
+    public void radixSortTest() {
+        Sort<Integer> radixSort  = new RadixSort();
+        Integer[] sort = radixSort.sort(array, descComparator);
+        System.out.println(Arrays.toString(sort));
+        System.out.println(Arrays.equals(descSorted, sort));
+    }
+    @Test
+    public void demoTest() {
+        System.out.println(Math.round(1.5));
+        System.out.println(Math.round(-1.6));
+        List<String> list=new ArrayList<>();
+        list.add("1");
+        Iterator<String> iterator = list.iterator();
+        ListIterator<String> stringListIterator = list.listIterator();
+        stringListIterator.add("2");
+        System.out.println(Arrays.toString(list.toArray()));
+
     }
 }

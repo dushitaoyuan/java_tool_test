@@ -30,7 +30,8 @@ public class BucketSort implements Sort<Integer> {
 
     @Override
     public Integer[] sort(Integer[] array, Comparator comparator) {
-        return (Integer[]) bucketSort(Arrays.asList(array), comparator, bucketSize).toArray();
+        List<Integer> list = bucketSort(Arrays.asList(array), comparator, bucketSize);
+        return  bucketSort(Arrays.asList(array), comparator, bucketSize).toArray(new Integer[list.size()]);
     }
 
     private List<Integer> bucketSort(List<Integer> array, Comparator comparator, int bucketSize) {
@@ -43,15 +44,15 @@ public class BucketSort implements Sort<Integer> {
                 min = array.get(i);
             }
         }
-        Integer bucketCount = Math.abs(max - min) / bucketSize;
+        Integer bucketCount = Math.abs(max - min) / bucketSize + 1;
         List<List<Integer>> bucketList = new ArrayList<>();
-        for (int i = 0;i < bucketCount; i++) {
+        for (int i = 0; i < bucketCount; i++) {
             bucketList.add(new ArrayList<>());
         }
         List<Integer> result = new ArrayList<>();
         for (int i = 0, len = array.size(); i < len; i++) {
-            int bucketNum = (array.get(i) - min) / bucketSize;
-            bucketList.get(bucketNum).add( array.get(i));
+            int bucketNum = (Math.abs(array.get(i) - min)) / bucketSize;
+            bucketList.get(bucketNum).add(array.get(i));
         }
         for (int i = 0; i < bucketCount; i++) {
             if (bucketSize == 1) {
@@ -59,6 +60,7 @@ public class BucketSort implements Sort<Integer> {
                     result.add(bucketList.get(i).get(j));
                 }
             } else {
+                //减小桶大小
                 if (bucketCount == 1) {
                     bucketSize--;
                 }
