@@ -34,7 +34,7 @@ public class BigFileSortTest {
         this.resultDir = "d://file/chunk/result";
         FileUtils.forceMkdir(new File(splitDir));
         FileUtils.forceMkdir(new File(resultDir));
-        this.numNum = 10000000;
+        this.numNum = 100000000;
     }
 
     @Test
@@ -42,8 +42,8 @@ public class BigFileSortTest {
         createBigNumTxt();
         Long start = System.currentTimeMillis();
         String mergeFile = "d://file/merge.txt";
-        BigFileMergeSort bigFileMergeSort = new BigFileMergeSort(100000, bigFile, splitDir, resultDir, mergeFile, descComparator);
-        bigFileMergeSort.sort();
+        BigFileMergeSort bigFileMergeSort = new BigFileMergeSort(100000, bigFile, splitDir, resultDir, mergeFile, descComparator, 4);
+        bigFileMergeSort.sortMultiThread();
         Long endSort = System.currentTimeMillis();
         BigFileMergeSort.IntFileStream intFileStream = new BigFileMergeSort.IntFileStream(mergeFile);
         int count = 0;
@@ -55,7 +55,6 @@ public class BigFileSortTest {
         System.out.println("排序耗时:" + (endSort - start));
         System.out.println("读取耗时:" + (endRead - endSort));
         System.out.println("总数是否匹配:" + Objects.equals(count, numNum));
-        intFileStream.close();
     }
 
     @Test
@@ -104,7 +103,7 @@ public class BigFileSortTest {
         RandomAccessFile src = new RandomAccessFile(bigFile, "rw");
         MappedByteBuffer map = src.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, src.length());
         int chunkCount = 0, allCount = 0, spiltCount = 0;
-        int spiltNum = 300;
+        int spiltNum = 10000;
         List<Integer> chunkIntList = new ArrayList<>(spiltNum);
         spiltCount++;
         while (map.hasRemaining()) {
@@ -125,19 +124,22 @@ public class BigFileSortTest {
         }
         System.out.println("总共切分片数:" + spiltCount);
         System.out.println("读取数字总数:" + allCount);
-        HelpUtil.cleanBuffer(map);
+        HelpUtil.unMapedBuffer(map);
 
     }
 
     private void newChunk(List<Integer> chunkIntList) throws Exception {
         if (!chunkIntList.isEmpty()) {
-            RandomAccessFile chunk = new RandomAccessFile(new File(splitDir, HelpUtil.getRandomChunk()), "rw");
+            File file = new File(splitDir, HelpUtil.getRandomChunk());
+            RandomAccessFile chunk = new RandomAccessFile(file, "rw");
             MappedByteBuffer chunkByteBuffer = chunk.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, chunkIntList.size() * 4);
             //排序后写入
             chunkIntList.stream().sorted(descComparator).forEach(num -> {
                 chunkByteBuffer.putInt(num);
             });
             chunk.close();
+            HelpUtil.unMapedBuffer(chunkByteBuffer);
+            FileUtils.deleteQuietly(file);
         }
     }
 

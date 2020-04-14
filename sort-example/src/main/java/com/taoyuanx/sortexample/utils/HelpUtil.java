@@ -1,6 +1,9 @@
 package com.taoyuanx.sortexample.utils;
 
+import sun.nio.ch.FileChannelImpl;
+
 import java.lang.reflect.Method;
+import java.nio.MappedByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.UUID;
@@ -14,10 +17,12 @@ public class HelpUtil {
         String chunkFilePrefix = "chunk_num_";
         return chunkFilePrefix + UUID.randomUUID().toString().replaceAll("-", "") + ".chunk";
     }
+
     public static String getRandomResultChunk() {
         String chunkFilePrefix = "chunk_num_result";
         return chunkFilePrefix + UUID.randomUUID().toString().replaceAll("-", "") + ".result";
     }
+
     public static void cleanBuffer(Object buffer) {
         if (buffer != null) {
             AccessController.doPrivileged(new PrivilegedAction() {
@@ -25,10 +30,12 @@ public class HelpUtil {
                 public Object run() {
                     try {
                         Method getCleanerMethod = buffer.getClass().getMethod("cleaner", new Class[0]);
-                        getCleanerMethod.setAccessible(true);
-                        sun.misc.Cleaner cleaner = (sun.misc.Cleaner) getCleanerMethod.invoke(buffer, new Object[0]);
-                        if(cleaner!=null){
-                            cleaner.clean();
+                        if (getCleanerMethod != null) {
+                            getCleanerMethod.setAccessible(true);
+                            sun.misc.Cleaner cleaner = (sun.misc.Cleaner) getCleanerMethod.invoke(buffer, new Object[0]);
+                            if (cleaner != null) {
+                                cleaner.clean();
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -37,7 +44,18 @@ public class HelpUtil {
                 }
             });
         }
+    }
 
+
+    public static void unMapedBuffer(Object buffer)  {
+        try {
+            Method m = FileChannelImpl.class.getDeclaredMethod("unmap",
+                    MappedByteBuffer.class);
+            m.setAccessible(true);
+            m.invoke(FileChannelImpl.class, buffer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }
