@@ -4,10 +4,7 @@ import com.taoyuanx.sortexample.utils.HelpUtil;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -15,11 +12,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author dushitaoyuan
@@ -48,10 +43,12 @@ public class BigFileMergeSort {
     private String resultDir;
     private LinkedBlockingDeque<File> chunkQueue;
     private AtomicBoolean splitDone;
-    private Integer mergeThreadSize;
+    private Integer threadSize;
+
+    private ThreadPoolExecutor mergePool = null;
 
     public BigFileMergeSort(Integer splitSize, String srcFile, String spiltDir, String resultDir, String mergeFile, Comparator<Integer> comparator
-            , Integer mergeThreadSize) {
+            , Integer threadSize) {
         this.splitSize = splitSize;
         this.srcFile = srcFile;
         this.comparator = comparator;
@@ -63,7 +60,10 @@ public class BigFileMergeSort {
          * 文件是否分拆完毕
          */
         this.splitDone = new AtomicBoolean(false);
-        this.mergeThreadSize = mergeThreadSize;
+        this.threadSize = threadSize;
+        mergePool = new ThreadPoolExecutor(threadSize, threadSize,
+                0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingDeque<>());
     }
 
     public BigFileMergeSort(Integer splitSize, String srcFile, String spiltDir, String resultDir, String mergeFile, Comparator<Integer> comparator
@@ -79,25 +79,12 @@ public class BigFileMergeSort {
 
 
     public void sortMultiThread() throws Exception {
-        ThreadPoolExecutor mergePool = new ThreadPoolExecutor(mergeThreadSize, mergeThreadSize,
-                0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>());
-        mergePool.execute(new Runnable() {
-            @SneakyThrows
-            @Override
-            public void run() {
-                fileSpilt();
-                splitDone.set(true);
-            }
-        });
+        fileSpilt();
         int limit = 4;
-        for (int i = 0; i < mergeThreadSize; i++) {
+        for (int i = 0; i < threadSize; i++) {
             mergePool.execute(new IntFileMergeTask(limit, splitDone));
         }
         mergePool.shutdown();
-        while (mergePool.awaitTermination(3, TimeUnit.SECONDS)) {
-            Thread.sleep(3000L);
-        }
         File chunkFileLeft = chunkQueue.poll();
         File mergeFile = null;
         while (chunkQueue.size() > 0) {
@@ -116,7 +103,10 @@ public class BigFileMergeSort {
     }
 
     public void sortSingleThread() throws Exception {
+        Long start = System.currentTimeMillis();
         fileSpilt();
+        Long end = System.currentTimeMillis();
+        System.out.println("拆分总耗时:" + (end - start));
         File chunkFileLeft = chunkQueue.poll();
         File mergeFile = null;
         while (chunkQueue.size() > 0) {
@@ -148,34 +138,65 @@ public class BigFileMergeSort {
             chunkCount++;
             chunkIntList.add(num);
             if (chunkIntList.size() >= splitSize) {
-                newChunk(chunkIntList);
+                newChunk(chunkIntList, false);
                 chunkIntList = new ArrayList<>(splitSize);
                 spiltCount++;
                 chunkCount = 0;
             }
         }
         if (chunkCount > 0) {
-            newChunk(chunkIntList);
+            newChunk(chunkIntList, true);
+            spiltCount++;
         }
         src.close();
         HelpUtil.unMapedBuffer(map);
         System.out.println("总共切分片数:" + spiltCount);
         System.out.println("读取数字总数:" + allCount);
+
+
     }
 
-    private void newChunk(List<Integer> chunkIntList) throws Exception {
+    private void newChunk(List<Integer> chunkIntList, boolean isLast) throws Exception {
         if (!chunkIntList.isEmpty()) {
-            File chunkFile = new File(this.spiltDir, HelpUtil.getRandomChunk());
-            RandomAccessFile chunk = new RandomAccessFile(chunkFile, "rw");
-            MappedByteBuffer chunkByteBuffer = chunk.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, chunkIntList.size() * 4);
-            //排序后写入
-            chunkIntList.stream().sorted(comparator).forEach(num -> {
-                chunkByteBuffer.putInt(num);
-            });
-            chunk.close();
-            HelpUtil.unMapedBuffer(chunkByteBuffer);
-            chunkQueue.add(chunkFile);
+            if (mergePool != null) {
+                if (mergePool.getQueue().size() > threadSize) {
+                    doNewChunk(chunkIntList, isLast);
+                } else {
+                    mergePool.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                doNewChunk(chunkIntList, isLast);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+
+            } else {
+                doNewChunk(chunkIntList, isLast);
+            }
         }
+
+    }
+
+
+    private void doNewChunk(List<Integer> chunkIntList, boolean isLast) throws Exception {
+        File chunkFile = new File(spiltDir, HelpUtil.getRandomChunk());
+        RandomAccessFile chunk = new RandomAccessFile(chunkFile, "rw");
+        MappedByteBuffer chunkByteBuffer = chunk.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, chunkIntList.size() * 4);
+        //排序后写入
+        chunkIntList.stream().sorted(comparator).forEach(num -> {
+            chunkByteBuffer.putInt(num);
+        });
+        chunk.close();
+        HelpUtil.unMapedBuffer(chunkByteBuffer);
+        chunkQueue.add(chunkFile);
+        if (isLast) {
+            splitDone.set(true);
+        }
+
     }
 
 
@@ -261,6 +282,7 @@ public class BigFileMergeSort {
         }
     }
 
+
     private class IntFileMergeTask implements Runnable {
         private int limit;
         private AtomicBoolean done;
@@ -290,10 +312,8 @@ public class BigFileMergeSort {
                     fileMerge(new IntFileStream(chunkFileLeft), new IntFileStream(chunkFileRight), mergeFile.getAbsolutePath(), comparator);
                     chunkQueue.add(mergeFile);
                 }
-
-
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException("文件归并失败", e);
             }
         }
     }
