@@ -1,7 +1,6 @@
 package com.taoyuanx.sortexample;
 
 import com.taoyuanx.sortexample.utils.HelpUtil;
-import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -14,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author dushitaoyuan
@@ -24,12 +22,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 速度提升优化点:
  * 1. 分拆排序多线程
  * 2. 归并文件多线程
+ * 3. 拆分归并 并行
  * <p>
  * 同样机器配置,1000万数据:
  * 多线程 8.7s
  * 单线程:19s
  * 1亿数据
- * 多线程 15秒
+ * 多线程 150秒
  * 单线程 太慢了,测不了
  */
 public class BigFileMergeSort {
@@ -42,7 +41,10 @@ public class BigFileMergeSort {
     private String mergeFile;
     private String resultDir;
     private LinkedBlockingDeque<File> chunkQueue;
-    private AtomicBoolean splitDone;
+    /**
+     * 文件是否分拆完毕
+     */
+    private AtomicBoolean splitDone = new AtomicBoolean(false);
     private Integer threadSize;
 
     private ThreadPoolExecutor mergePool = null;
@@ -56,10 +58,6 @@ public class BigFileMergeSort {
         this.mergeFile = mergeFile;
         this.resultDir = resultDir;
         this.chunkQueue = new LinkedBlockingDeque<>();
-        /**
-         * 文件是否分拆完毕
-         */
-        this.splitDone = new AtomicBoolean(false);
         this.threadSize = threadSize;
         mergePool = new ThreadPoolExecutor(threadSize, threadSize,
                 0L, TimeUnit.MILLISECONDS,

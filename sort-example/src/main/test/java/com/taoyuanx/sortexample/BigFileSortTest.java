@@ -34,7 +34,7 @@ public class BigFileSortTest {
         this.resultDir = "d://file/chunk/result";
         FileUtils.forceMkdir(new File(splitDir));
         FileUtils.forceMkdir(new File(resultDir));
-        this.numNum = 100000000;
+        this.numNum = 10000000;
     }
 
     @Test
