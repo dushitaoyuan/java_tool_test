@@ -23,7 +23,7 @@ public class SelectSort<T> implements Sort<T> {
         int selectIndex = 0;
         for (int i = 0; i < array.length; i++) {
             selectIndex = i;
-            for (int j = i; j < array.length; j++) {
+            for (int j = selectIndex+1; j < array.length; j++) {
                 if (comparator.compare(array[selectIndex], array[j]) > 0) {
                     selectIndex = j;
                 }
