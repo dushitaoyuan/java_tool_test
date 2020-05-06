@@ -2,6 +2,7 @@ package com.taoyuanx.disruptor.example;
 
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.TimeoutException;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import com.lmax.disruptor.util.DaemonThreadFactory;
@@ -15,13 +16,15 @@ import com.taoyuanx.disruptor.example.producer.LogEventProducer;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class LogEventMain {
     public static void main(String[] args) throws Exception {
         mulConsumer();
     }
-    public static void mulConsumer() {
-        int bufferSize = 1024, consumerSize = 10;
+
+    public static void mulConsumer() throws Exception {
+        int bufferSize = 1024, consumerSize = 3;
         LogEventFactory logEventFactory = new LogEventFactory();
         Disruptor<LogEvent> disruptor = new Disruptor<>(logEventFactory, bufferSize, DaemonThreadFactory.INSTANCE, ProducerType.MULTI, new BlockingWaitStrategy());
         LogEventWorkHandler[] workPool = new LogEventWorkHandler[consumerSize];
@@ -42,14 +45,17 @@ public class LogEventMain {
         RingBuffer<LogEvent> ringBuffer = disruptor.getRingBuffer();
         LogEventProducer logEventProducer = new LogEventProducer(ringBuffer);
         int batch = 10;
-        ThreadPoolExecutor poolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
+        ThreadPoolExecutor poolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(3);
         for (int index = 0; index < batch; index++) {
             int finalIndex = index;
             poolExecutor.submit(() -> {
                 logEventProducer.producerData(finalIndex);
             });
         }
-
+        poolExecutor.shutdown();
+        while (!poolExecutor.awaitTermination(3, TimeUnit.SECONDS)) {
+            TimeUnit.SECONDS.sleep(3);
+        }
         disruptor.shutdown();
     }
 

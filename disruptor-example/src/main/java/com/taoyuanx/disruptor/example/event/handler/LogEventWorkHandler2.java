@@ -4,6 +4,8 @@ import com.lmax.disruptor.WorkHandler;
 import com.taoyuanx.disruptor.example.event.LogEvent;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author dushitaoyuan
  * @desc 用途描述
@@ -15,6 +17,6 @@ public class LogEventWorkHandler2 implements WorkHandler<LogEvent> {
     public void onEvent(LogEvent event) throws Exception {
         event.add();
         log.info("2处理日志:{}",event);
-
+        TimeUnit.SECONDS.sleep(3);
     }
 }
