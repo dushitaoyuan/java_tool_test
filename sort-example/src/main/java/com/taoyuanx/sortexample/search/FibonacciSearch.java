@@ -43,14 +43,18 @@ public class FibonacciSearch implements Search<Integer> {
         if (findData < sortedData[0] || findData > sortedData[sortedData.length - 1]) {
             return NOT_FIND;
         }
-        List<Integer> tempList = new ArrayList<>(sortedData.length);
-        int k = fibonacci(sortedData.length, tempList);
-        Integer[] fibonacci = tempList.toArray(new Integer[tempList.size()]);
-        Integer[] temp = Arrays.copyOf(sortedData, fibonacci[k] - 1);
-        int low = 0, high = sortedData.length - 1;
+        int[] f = fibonacci();
+        int low = 0, high = sortedData.length - 1, k = 0;
+        while (high > f[k] - 1) {
+            k++;
+        }
+        Integer[] temp = Arrays.copyOf(sortedData, f[k]);
+        for (int i = high + 1; i < temp.length; i++) {
+            temp[i] = sortedData[high];
+        }
         while (low <= high) {
-            int middle = low + fibonacci[k - 1] - 1;
-            Integer middleData = temp[middle] == null ? sortedData[sortedData.length - 1] : temp[middle];
+            int middle = low + f[k - 1] - 1;
+            Integer middleData = temp[middle];
             if (middleData.equals(findData)) {
                 return middle;
             } else if (findData > middleData) {
@@ -67,14 +71,16 @@ public class FibonacciSearch implements Search<Integer> {
     /**
      * 构造一个 斐波那契数列
      */
-    public int fibonacci(int fibonacciSize, List<Integer> f) {
-        f.add(1);
-        f.add(2);
-        int k = 0;
-        for (int i = 2; fibonacciSize > f.get(k) - 1; i++, k++) {
-            f.add(f.get(i - 1) + f.get(i - 2));
+    int maxSize = 20;
+
+    public int[] fibonacci() {
+        int[] f = new int[maxSize];
+        f[0] = 1;
+        f[1] = 1;
+        for (int i = 2; i < maxSize; i++) {
+            f[i] = f[i - 1] + f[i - 2];
         }
-        return k;
+        return f;
 
     }
 

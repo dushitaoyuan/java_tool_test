@@ -15,8 +15,8 @@ public class BinarySearch implements Search<Integer> {
         if (findData < sortedData[0] || findData > sortedData[sortedData.length - 1]) {
             return NOT_FIND;
         }
-        //return recursionSearch(sortedData, findData, 0, sortedData.length);
-        return searchWhile(sortedData, findData);
+        return recursionSearch(sortedData, findData, 0, sortedData.length);
+        // return searchWhile(sortedData, findData);
 
     }
 
