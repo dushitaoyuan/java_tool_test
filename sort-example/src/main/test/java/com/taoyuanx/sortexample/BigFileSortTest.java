@@ -22,9 +22,7 @@ public class BigFileSortTest {
     private String splitDir;
     private String resultDir;
     private int numNum;
-    private Comparator<Integer> ascComparator = (x, y) -> {
-        return x - y;
-    };
+    private Comparator<Integer> ascComparator = Comparator.comparingInt(x -> x);
     private Comparator<Integer> descComparator = ascComparator.reversed();
 
     @Before
@@ -34,7 +32,7 @@ public class BigFileSortTest {
         this.resultDir = "d://file/chunk/result";
         FileUtils.forceMkdir(new File(splitDir));
         FileUtils.forceMkdir(new File(resultDir));
-        this.numNum = 10000000;
+        this.numNum = 100000000;
     }
 
     @Test

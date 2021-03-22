@@ -20,9 +20,10 @@ public class InsertSort<T> implements Sort<T> {
 
     @Override
     public T[] sort(T[] array, Comparator comparator) {
-        for (int i = 0; i < array.length - 1; i++) {
-            T current = array[i + 1];
-            int sortIndex = i;
+
+        for (int i = 1; i < array.length; i++) {
+            int sortIndex = i-1;
+            T current = array[i];
             while (sortIndex >= 0 && comparator.compare(array[sortIndex], current) > 0) {
                 //后移一位
                 array[sortIndex + 1] = array[sortIndex];

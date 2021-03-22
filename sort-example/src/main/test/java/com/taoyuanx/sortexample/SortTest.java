@@ -10,7 +10,6 @@ import java.util.*;
  * @author dushitaoyuan
  * @desc 排序测试
  * @date 2020/4/7
- *
  */
 public class SortTest {
     private Integer[] array;
@@ -49,9 +48,29 @@ public class SortTest {
     @Test
     public void insertSortTest() {
         Sort<Integer> integerSort = new InsertSort<>();
-        Integer[] sort = integerSort.sort(array, descComparator);
+        Integer[] sort = integerSort.sort(array, ascComparator);
         System.out.println(Arrays.toString(sort));
-        System.out.println(Arrays.equals(descSorted, sort));
+        System.out.println(Arrays.equals(ascSorted, sort));
+    }
+
+    @Test
+    public void sSort() {
+        for (int i = 0; i < array.length; i++) {
+            int select = i;
+            for (int j = select + 1; j < array.length; j++) {
+                if (array[select] > array[j]) {
+                    select = j;
+                }
+            }
+            if (i != select) {
+                int temp = array[i];
+                array[i] = array[select];
+                array[select] = temp;
+            }
+
+        }
+        System.out.println(Arrays.toString(array));
+        System.out.println(Arrays.equals(ascSorted, array));
     }
 
     @Test
@@ -103,18 +122,20 @@ public class SortTest {
         System.out.println(Arrays.toString(sort));
         System.out.println(Arrays.equals(descSorted, sort));
     }
+
     @Test
     public void radixSortTest() {
-        Sort<Integer> radixSort  = new RadixSort();
+        Sort<Integer> radixSort = new RadixSort();
         Integer[] sort = radixSort.sort(array, descComparator);
         System.out.println(Arrays.toString(sort));
         System.out.println(Arrays.equals(descSorted, sort));
     }
+
     @Test
     public void demoTest() {
         System.out.println(Math.round(1.5));
         System.out.println(Math.round(-1.6));
-        List<String> list=new ArrayList<>();
+        List<String> list = new ArrayList<>();
         list.add("1");
         Iterator<String> iterator = list.iterator();
         ListIterator<String> stringListIterator = list.listIterator();
