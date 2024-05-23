@@ -64,17 +64,19 @@ public class BigFileSortTest {
         ArrayList<Integer> topList = new ArrayList<>();
         int topNum = 5;
         Map<Integer, Integer> numCount = new HashMap<>();
+
         Comparator<Integer> descComparator = (x, y) -> {
-            return y - x;
+            return numCount.get(y) - numCount.get(x);
         };
         while (intFileStream.hasNext()) {
             Integer next = intFileStream.next();
             Integer count = numCount.get(next);
             if (count == null) {
+                // 当不存在于map中时，认为已经map中的数字出现次数已经统计完毕
                 if (topList.size() > topNum) {
                     Collections.sort(topList, descComparator);
+
                     Integer minNum = topList.remove(topList.size() - 1);
-                    // System.out.println("淘汰数据" + minNum);
                     numCount.remove(minNum);
                 }
                 numCount.put(next, 1);
@@ -84,11 +86,9 @@ public class BigFileSortTest {
             }
         }
         int count = 0;
-        for (Integer num : numCount.keySet()) {
-            count += numCount.get(num);
-        }
-
+        Collections.sort(topList, descComparator);
         System.out.println(numCount);
+        System.out.println(topList);
         System.out.println(count);
 
     }

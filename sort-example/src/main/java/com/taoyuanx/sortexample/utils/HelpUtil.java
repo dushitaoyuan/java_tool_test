@@ -1,11 +1,5 @@
 package com.taoyuanx.sortexample.utils;
 
-import sun.nio.ch.FileChannelImpl;
-
-import java.lang.reflect.Method;
-import java.nio.MappedByteBuffer;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.UUID;
 
 /**
@@ -24,7 +18,7 @@ public class HelpUtil {
     }
 
     public static void cleanBuffer(Object buffer) {
-        if (buffer != null) {
+  /*      if (buffer != null) {
             AccessController.doPrivileged(new PrivilegedAction() {
                 @Override
                 public Object run() {
@@ -43,19 +37,19 @@ public class HelpUtil {
                     return null;
                 }
             });
-        }
+        }*/
     }
 
 
     public static void unMapedBuffer(Object buffer)  {
-        try {
+      /*  try {
             Method m = FileChannelImpl.class.getDeclaredMethod("unmap",
                     MappedByteBuffer.class);
             m.setAccessible(true);
             m.invoke(FileChannelImpl.class, buffer);
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 }
