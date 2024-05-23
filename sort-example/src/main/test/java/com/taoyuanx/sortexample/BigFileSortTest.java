@@ -27,9 +27,10 @@ public class BigFileSortTest {
 
     @Before
     public void before() throws IOException {
-        this.bigFile = "d://file/bigNum.txt";
-        this.splitDir = "d://file/chunk/";
-        this.resultDir = "d://file/chunk/result";
+
+        this.bigFile = "/Users/taoyuan/tmp/file/bigNum.txt";
+        this.splitDir = "/Users/taoyuan/tmp/file/chunk/";
+        this.resultDir = "/Users/taoyuan/tmp/file/chunk/result";
         FileUtils.forceMkdir(new File(splitDir));
         FileUtils.forceMkdir(new File(resultDir));
         this.numNum = 100000000;
@@ -39,7 +40,7 @@ public class BigFileSortTest {
     public void sortTest() throws Exception {
         createBigNumTxt();
         Long start = System.currentTimeMillis();
-        String mergeFile = "d://file/merge.txt";
+        String mergeFile = "/Users/taoyuan/tmp/file/merge.txt";
         BigFileMergeSort bigFileMergeSort = new BigFileMergeSort(100000, bigFile, splitDir, resultDir, mergeFile, descComparator, 4);
         bigFileMergeSort.sortMultiThread();
         Long endSort = System.currentTimeMillis();
@@ -53,6 +54,43 @@ public class BigFileSortTest {
         System.out.println("排序耗时:" + (endSort - start));
         System.out.println("读取耗时:" + (endRead - endSort));
         System.out.println("总数是否匹配:" + Objects.equals(count, numNum));
+    }
+
+    @Test
+    public void topTest() throws Exception {
+        String mergeFile = "/Users/taoyuan/tmp/file/merge.txt";
+
+        BigFileMergeSort.IntFileStream intFileStream = new BigFileMergeSort.IntFileStream(mergeFile);
+        ArrayList<Integer> topList = new ArrayList<>();
+        int topNum = 5;
+        Map<Integer, Integer> numCount = new HashMap<>();
+        Comparator<Integer> descComparator = (x, y) -> {
+            return y - x;
+        };
+        while (intFileStream.hasNext()) {
+            Integer next = intFileStream.next();
+            Integer count = numCount.get(next);
+            if (count == null) {
+                if (topList.size() > topNum) {
+                    Collections.sort(topList, descComparator);
+                    Integer minNum = topList.remove(topList.size() - 1);
+                    // System.out.println("淘汰数据" + minNum);
+                    numCount.remove(minNum);
+                }
+                numCount.put(next, 1);
+                topList.add(next);
+            } else {
+                numCount.put(next, numCount.get(next) + 1);
+            }
+        }
+        int count = 0;
+        for (Integer num : numCount.keySet()) {
+            count += numCount.get(num);
+        }
+
+        System.out.println(numCount);
+        System.out.println(count);
+
     }
 
     @Test
@@ -82,13 +120,27 @@ public class BigFileSortTest {
     }
 
     @Test
+    public void readResultBigNumTxt() throws Exception {
+        String mergeFile = "/Users/taoyuan/tmp/file/merge.txt";
+
+        BigFileMergeSort.IntFileStream intFileStream = new BigFileMergeSort.IntFileStream(mergeFile);
+
+        int count = 0;
+        while (intFileStream.hasNext()) {
+            Integer next = intFileStream.next();
+            count++;
+        }
+        System.out.println("总数：" + count);
+    }
+
+    @Test
     public void bigFileReadTest() throws Exception {
-        RandomAccessFile src = new RandomAccessFile("d:\\file\\chunk\\result\\chunk_num_resultf615a78f26b1474d8dfafe6cf5883e04.result", "rw");
+
+        RandomAccessFile src = new RandomAccessFile(bigFile, "rw");
         MappedByteBuffer map = src.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, src.length());
         int count = 0;
         while (map.hasRemaining()) {
             int num = map.getInt();
-            System.out.println(num);
             map.getChar();
             count++;
         }
