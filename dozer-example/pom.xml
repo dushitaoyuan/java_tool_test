@@ -36,10 +36,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>net.sf.dozer</groupId>
-      <artifactId>dozer</artifactId>
-      <version>5.5.1</version>
+      <groupId>com.github.dozermapper</groupId>
+      <artifactId>dozer-core</artifactId>
+      <version>6.5.2</version>
     </dependency>
+
     <dependency>
       <groupId>org.openjdk.jmh</groupId>
       <artifactId>jmh-core</artifactId>
@@ -70,6 +71,12 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
       <version>4.3.24.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib</artifactId>
+      <version>3.3.0</version>
     </dependency>
 
   </dependencies>

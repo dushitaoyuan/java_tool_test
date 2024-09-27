@@ -28,9 +28,9 @@ public class BigFileSortTest {
     @Before
     public void before() throws IOException {
 
-        this.bigFile = "/Users/taoyuan/tmp/file/bigNum.txt";
-        this.splitDir = "/Users/taoyuan/tmp/file/chunk/";
-        this.resultDir = "/Users/taoyuan/tmp/file/chunk/result";
+        this.bigFile = "/Users/lianglei78/tmp/file/bigNum.txt";
+        this.splitDir = "/Users/lianglei78/tmp/file/chunk/";
+        this.resultDir = "/Users/lianglei78/tmp/file/chunk/result";
         FileUtils.forceMkdir(new File(splitDir));
         FileUtils.forceMkdir(new File(resultDir));
         this.numNum = 100000000;
@@ -40,7 +40,7 @@ public class BigFileSortTest {
     public void sortTest() throws Exception {
         createBigNumTxt();
         Long start = System.currentTimeMillis();
-        String mergeFile = "/Users/taoyuan/tmp/file/merge.txt";
+        String mergeFile = "/Users/lianglei78/tmp/file/merge.txt";
         BigFileMergeSort bigFileMergeSort = new BigFileMergeSort(100000, bigFile, splitDir, resultDir, mergeFile, descComparator, 4);
         bigFileMergeSort.sortMultiThread();
         Long endSort = System.currentTimeMillis();
@@ -58,7 +58,7 @@ public class BigFileSortTest {
 
     @Test
     public void topTest() throws Exception {
-        String mergeFile = "/Users/taoyuan/tmp/file/merge.txt";
+        String mergeFile = "/Users/lianglei78/tmp/file/merge.txt";
 
         BigFileMergeSort.IntFileStream intFileStream = new BigFileMergeSort.IntFileStream(mergeFile);
         ArrayList<Integer> topList = new ArrayList<>();
@@ -121,7 +121,7 @@ public class BigFileSortTest {
 
     @Test
     public void readResultBigNumTxt() throws Exception {
-        String mergeFile = "/Users/taoyuan/tmp/file/merge.txt";
+        String mergeFile = "/Users/lianglei78/tmp/file/merge.txt";
 
         BigFileMergeSort.IntFileStream intFileStream = new BigFileMergeSort.IntFileStream(mergeFile);
 

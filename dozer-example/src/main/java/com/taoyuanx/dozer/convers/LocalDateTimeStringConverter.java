@@ -1,6 +1,7 @@
 package com.taoyuanx.dozer.convers;
 
-import org.dozer.DozerConverter;
+
+import com.github.dozermapper.core.DozerConverter;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

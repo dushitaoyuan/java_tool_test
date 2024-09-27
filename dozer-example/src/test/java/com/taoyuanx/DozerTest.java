@@ -3,6 +3,7 @@ package com.taoyuanx;
 import com.taoyuanx.dozer.CBeanMapper;
 import com.taoyuanx.dto.UserDTO;
 import com.taoyuanx.entity.UserDO;
+import net.sf.cglib.beans.BeanCopier;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.junit.Test;
@@ -101,16 +102,23 @@ public class DozerTest {
 
     }
 
+    @Benchmark
+    public void testCglibBeanCopy() {
+        BeanCopier copier = BeanCopier.create(UserDO.class, UserDTO.class, false);
+        UserDO userDO = new UserDO();
+        userDO.setAge("12");
+        userDO.setName("name");
+        copier.copy(userDO, new UserDTO(), null);
+    }
+
 
     public static void main(String[] args) throws Exception {
-        Options opt = new OptionsBuilder()
-                .include(DozerTest.class.getSimpleName()) //benchmark 所在的类的名字，注意这里是使用正则表达式对所有类进行匹配的
+        Options opt = new OptionsBuilder().include(DozerTest.class.getSimpleName()) //benchmark 所在的类的名字，注意这里是使用正则表达式对所有类进行匹配的
                 .forks(1) //进行 fork 的次数。如果 fork 数是2的话，则 JMH 会 fork 出两个进程来进行测试
                 .warmupIterations(1) //预热的迭代次数
                 .measurementIterations(1) //实际测量的迭代次数
-                .measurementBatchSize(100)
-                .warmupBatchSize(100)
-                .build();
+                .threads(10)
+                .measurementBatchSize(300).warmupBatchSize(10).build();
         Collection<RunResult> run = new Runner(opt).run();
 
     }

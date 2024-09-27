@@ -1,7 +1,7 @@
 package com.taoyuanx.dozer.convers;
 
+import com.github.dozermapper.core.DozerConverter;
 import com.vip.vjtools.vjkit.time.DateFormatUtil;
-import org.dozer.DozerConverter;
 
 import java.text.ParseException;
 import java.util.Date;

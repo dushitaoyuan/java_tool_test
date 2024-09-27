@@ -1,17 +1,15 @@
 package com.taoyuanx.dozer;
 
-import com.google.common.collect.Lists;
+import com.github.dozermapper.core.DozerBeanMapperBuilder;
+import com.github.dozermapper.core.Mapper;
 import com.vip.vjtools.vjkit.collection.ArrayUtil;
-import org.dozer.DozerBeanMapper;
-import org.dozer.Mapper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class CBeanMapper {
-    public static final String[] mapings = {"dozer.xml"};
-    private static Mapper mapper = new DozerBeanMapper(Lists.newArrayList(mapings));
+    private static Mapper mapper = DozerBeanMapperBuilder.create().withMappingFiles("dozer.xml").build();
 
 
     /**
@@ -26,7 +24,7 @@ public class CBeanMapper {
      *
      * @return
      */
-    public static <S, D> D map(S source, Class<D> destinationClass, CBeanAfterHandler<S,D>  beanAfterHandler) {
+    public static <S, D> D map(S source, Class<D> destinationClass, CBeanAfterHandler<S, D> beanAfterHandler) {
         D d = mapper.map(source, destinationClass);
         beanAfterHandler.handle(source, d);
         return d;
@@ -50,7 +48,7 @@ public class CBeanMapper {
      *
      * @return
      */
-    public static <S, D> List<D> mapList(Iterable<S> sourceList, Class<D> destinationClass, CBeanAfterHandler<S,D>  beanAfterHandler) {
+    public static <S, D> List<D> mapList(Iterable<S> sourceList, Class<D> destinationClass, CBeanAfterHandler<S, D> beanAfterHandler) {
         List<D> destionationList = new ArrayList<D>();
         D d = null;
         for (S source : sourceList) {
@@ -85,7 +83,7 @@ public class CBeanMapper {
      *
      * @return
      */
-    public static <S, D> D[] mapArray(final S[] sourceArray, final Class<D> destinationClass, CBeanAfterHandler<S,D> beanAfterHandler) {
+    public static <S, D> D[] mapArray(final S[] sourceArray, final Class<D> destinationClass, CBeanAfterHandler<S, D> beanAfterHandler) {
         D[] destinationArray = ArrayUtil.newArray(destinationClass, sourceArray.length);
 
         int i = 0;
